@@ -75,6 +75,68 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+    private void editNotes(Notes notes) {
+
+        updateData(notes);
+    }
+
+    private void updateData(Notes notes) {
+
+        Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.dialog_add);
+
+        Objects.requireNonNull(dialog.getWindow()).setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        dialog.setCancelable(true);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(Objects.requireNonNull(dialog.getWindow()).getAttributes());
+        layoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
+        layoutParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        dialog.getWindow().setAttributes(layoutParams);
+
+        imageButton = dialog.findViewById(R.id.imageButtonId);
+
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+
+        final EditText editText = dialog.findViewById(R.id.editTextId);
+
+
+
+
+        button = dialog.findViewById(R.id.addButton);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (TextUtils.isEmpty(editText.getText())) {
+
+                    editText.setError("This field can not be empty");
+                } else {
+
+                 //   addDataToFirebase(editText.getText().toString());
+
+                    updateData((Notes) notes,editText.getText().toString());
+                    dialog.dismiss();
+
+
+                }
+            }
+        });
+
+
+        dialog.show();
+
+    }
+
+
+
     private void showDialog() {
 
         Dialog dialog = new Dialog(this);
@@ -116,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
 
                     addDataToFirebase(editText.getText().toString());
 
+
                 }
             }
         });
@@ -123,6 +186,17 @@ public class MainActivity extends AppCompatActivity {
 
         dialog.show();
 
+    }
+
+    private void updateData(Notes  notes, String newText) {
+
+        myRef.child(notes.getId()).child("text").setValue(newText).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                Toast.makeText(MainActivity.this, "Updated Successfully", Toast.LENGTH_SHORT).show();
+
+            }
+        });
     }
 
 
@@ -211,11 +285,6 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Data Has Been Deleted " +notes.getText(),Toast.LENGTH_LONG).show();
             }
         });
-
-    }
-
-    private void editNotes(Notes notes) {
-
 
     }
 
